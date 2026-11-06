@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>שאלון להורים – יפתח צפריר, פסיכולוג חינוכי מומחה</title>
+<style>
+  :root{
+    --ink:#1f2933; --muted:#5f6b7a; --line:#d5dbe3; --soft:#f4f6f9;
+    --accent:#2f5d8a; --accent-soft:#e7eef6; --paper:#ffffff;
+  }
+  *{box-sizing:border-box}
+  html{background:#eceff3}
+  body{
+    margin:0; color:var(--ink);
+    font-family:"Segoe UI","Arial Hebrew","David","Arial",sans-serif;
+    font-size:16px; line-height:1.55;
+  }
+  .page{max-width:880px;margin:24px auto 120px;background:var(--paper);
+    padding:40px 48px;border-radius:10px;box-shadow:0 2px 14px rgba(0,0,0,.07)}
+  header.top{border-bottom:3px solid var(--accent);padding-bottom:14px;margin-bottom:8px}
+  header.top h1{margin:0;font-size:30px;color:var(--accent)}
+  header.top .who{margin-top:4px;color:var(--muted);font-size:15px}
+  .note{background:var(--accent-soft);border-radius:8px;padding:12px 16px;margin:18px 0 6px;font-size:14.5px}
+  .note b{color:var(--accent)}
+
+  section{margin-top:34px}
+  section > h2{font-size:21px;margin:0 0 14px;padding-bottom:6px;
+    border-bottom:1px solid var(--line);color:var(--accent)}
+  h3{font-size:16.5px;margin:22px 0 8px}
+
+  .grid{display:grid;gap:12px 18px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+  label.f{display:flex;flex-direction:column;font-size:14px;color:var(--muted);gap:4px}
+  input[type=text],input[type=date],input[type=number],textarea{
+    font:inherit;color:var(--ink);border:1px solid var(--line);border-radius:6px;
+    padding:7px 10px;background:#fff;width:100%}
+  input:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
+  textarea{min-height:76px;resize:vertical;overflow:hidden}
+  .q{margin:18px 0 6px;font-weight:600}
+  .q small{font-weight:400;color:var(--muted)}
+
+  .choice{display:flex;flex-wrap:wrap;gap:8px 10px;margin:6px 0}
+  .choice label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);
+    border-radius:20px;padding:5px 12px;cursor:pointer;background:#fff;font-size:15px}
+  .choice label:has(input:checked){background:var(--accent-soft);border-color:var(--accent)}
+  .choice input{accent-color:var(--accent);margin:0}
+
+  .traits{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:6px 10px;margin:8px 0 10px}
+  .traits label{display:flex;gap:6px;align-items:center;font-size:15px;cursor:pointer}
+  .traits input{accent-color:var(--accent)}
+
+  table{width:100%;border-collapse:collapse;margin:8px 0}
+  th,td{border:1px solid var(--line);padding:6px 8px;text-align:right;vertical-align:middle}
+  th{background:var(--soft);font-weight:600;font-size:14px}
+  td input[type=text]{border:none;padding:4px 2px;border-bottom:1px dashed var(--line);border-radius:0}
+  td.n{width:34px;text-align:center;color:var(--muted)}
+  .rate{display:flex;flex-wrap:wrap;gap:6px}
+  .rate label{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:20px;
+    padding:4px 11px;cursor:pointer;background:#fff;font-size:14px;white-space:nowrap}
+  .rate label:has(input:checked){background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+  .rate input{accent-color:var(--accent);margin:0}
+  .legend{font-size:13.5px;color:var(--muted);background:var(--soft);border-radius:6px;padding:6px 10px;margin:4px 0 10px}
+
+  /* behaviour checklist */
+  .cbcl .item{display:grid;grid-template-columns:44px 1fr auto;gap:8px;align-items:center;
+    border-bottom:1px solid #eef1f5;padding:6px 0}
+  .cbcl .item:nth-child(even){background:#fafbfc}
+  .cbcl .num{color:var(--muted);text-align:center;font-size:14px}
+  .cbcl .txt{font-size:15.5px}
+  .cbcl .desc{grid-column:2 / 4;margin:2px 0 6px;display:flex;align-items:baseline;gap:8px}
+  .cbcl .desc span{font-size:14.5px;color:var(--muted);white-space:nowrap}
+  .cbcl .desc input{font-size:15px;border:none;border-bottom:1px solid #b9c2cd;border-radius:0;padding:4px 2px;background:transparent}
+  .cbcl .desc input:focus{outline:none;border-bottom:2px solid var(--accent)}
+  .cbcl .desc input,.cbcl .desc textarea{flex:1;min-width:0}
+  .cbcl .sub{padding-right:20px}
+  .cbcl .sub .txt{color:#3a4654}
+
+  .closing{margin-top:40px;padding:20px;border-radius:8px;background:var(--soft)}
+  .sign{margin-top:16px;font-weight:600}
+  .sign span{display:block;font-weight:400;color:var(--muted)}
+
+  /* toolbar */
+  .bar{position:fixed;bottom:0;right:0;left:0;background:rgba(255,255,255,.97);
+    border-top:1px solid var(--line);display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+    padding:10px 12px;z-index:20}
+  .bar button{font:inherit;font-size:14.5px;border:1px solid var(--accent);background:#fff;color:var(--accent);
+    padding:7px 14px;border-radius:6px;cursor:pointer}
+  .bar button.primary{background:var(--accent);color:#fff}
+  .bar .status{align-self:center;font-size:13px;color:var(--muted);min-width:120px;text-align:center}
+  #fileIn{display:none}
+
+  @media (max-width:640px){
+    .page{padding:22px 16px;margin:0 0 140px;border-radius:0}
+    header.top h1{font-size:25px}
+    .cbcl .item{grid-template-columns:34px 1fr}
+    .cbcl .item > .rate{grid-column:2 / 3;margin-bottom:4px}
+    .cbcl .desc{grid-column:2 / 3}
+    table.rt thead{display:none}
+    table.rt tr{display:block;border:1px solid var(--line);border-radius:8px;margin:0 0 10px;padding:6px 8px}
+    table.rt td{display:block;border:none;padding:4px 0}
+    table.rt td.n{display:none}
+  }
+  table.act thead{display:none}
+  table.act tr{display:block;border:1px solid var(--line);border-radius:8px;margin:0 0 10px;padding:8px 12px}
+  table.act td{display:block;border:none;padding:4px 0}
+  table.act td.n{display:none}
+  table.act td[data-label]::before{content:attr(data-label);display:block;font-size:13.5px;color:var(--muted);margin-bottom:3px}
+  table.act td input[type=text]{border:1px solid var(--line);border-radius:6px;padding:7px 10px}
+
+  @media print{
+    html,body{background:#fff}
+    .page{box-shadow:none;margin:0;padding:0;max-width:none}
+    .bar,.no-print{display:none!important}
+    section{break-inside:auto}
+    .item,tr,.q,label.f{break-inside:avoid}
+    h2,h3,.q,.legend{break-after:avoid}
+    textarea{border:1px solid #bbb;resize:none}
+    input[type=text],input[type=date],input[type=number]{border:none;border-bottom:1px solid #999;border-radius:0}
+    .choice label{border-color:#bbb}
+    .choice label:has(input:checked){background:#e6e6e6;border-color:#333;font-weight:600}
+    a{color:inherit;text-decoration:none}
+    @page{size:A4;margin:14mm 13mm}
+  }
+</style>
+</head>
+<body>
+<form class="page" id="form" autocomplete="off" onsubmit="return false">
+
+<header class="top">
+  <h1>שאלון להורים</h1>
+  <div class="who">יפתח צפריר · פסיכולוג חינוכי מומחה</div>
+</header>
+
+<div class="note no-print">
+  <b>איך ממלאים?</b> ממלאים ישירות בקובץ זה, במחשב שלכם. התשובות נשמרות רק במחשב שלכם ואינן נשלחות לשום מקום.
+  אפשר להפסיק ולהמשיך מאוחר יותר. בסיום לוחצים על <b>„שמירה כ-PDF / הדפסה”</b> ושולחים את הקובץ שנוצר,
+  או לוחצים על <b>„שמירת עותק ממולא”</b> ושולחים את הקובץ שיורד.
+</div>
+
+<div class="grid" style="margin-top:16px">
+  <label class="f">שם ממלא/ת השאלון<input type="text" name="filler"></label>
+  <label class="f">קרבה לילד/ה<input type="text" name="filler_rel" placeholder="אם / אב / אחר"></label>
+  <label class="f">תאריך מילוי השאלון<input type="date" name="fill_date"></label>
+</div>
+
+<!-- ============ פרטי הילד ============ -->
+<section>
+  <h2>פרטי הילד/ה</h2>
+  <div class="grid">
+    <label class="f">שם משפחה<input type="text" name="c_last"></label>
+    <label class="f">שם פרטי<input type="text" name="c_first"></label>
+    <label class="f">ת.ז.<input type="text" name="c_id" inputmode="numeric" maxlength="9"></label>
+    <label class="f">תאריך לידה<input type="date" name="c_dob"></label>
+    <label class="f">ארץ לידה<input type="text" name="c_country"></label>
+    <label class="f">תאריך עלייה<input type="text" name="c_aliya" placeholder="אם רלוונטי"></label>
+    <label class="f">כתובת<input type="text" name="c_address"></label>
+    <label class="f">מיקוד<input type="text" name="c_zip" inputmode="numeric"></label>
+    <label class="f">טלפון<input type="text" name="c_phone" inputmode="tel"></label>
+    <label class="f">בית ספר / גן<input type="text" name="c_school"></label>
+    <label class="f">מקום בית הספר / הגן<input type="text" name="c_school_place"></label>
+    <label class="f">כיתה<input type="text" name="c_class"></label>
+    <label class="f">שם המחנכת / הגננת<input type="text" name="c_teacher"></label>
+    <label class="f">שם היועצת<input type="text" name="c_counselor"></label>
+  </div>
+</section>
+
+<!-- ============ פרטי המשפחה ============ -->
+<section>
+  <h2>פרטי המשפחה</h2>
+  <h3>האב</h3>
+  <div class="grid">
+    <label class="f">שם האב<input type="text" name="f_name"></label>
+    <label class="f">שנת וארץ לידה<input type="text" name="f_birth"></label>
+    <label class="f">השכלה<input type="text" name="f_edu"></label>
+    <label class="f">מקצוע<input type="text" name="f_job"></label>
+  </div>
+  <h3>האם</h3>
+  <div class="grid">
+    <label class="f">שם האם<input type="text" name="m_name"></label>
+    <label class="f">שנת וארץ לידה<input type="text" name="m_birth"></label>
+    <label class="f">השכלה<input type="text" name="m_edu"></label>
+    <label class="f">מקצוע<input type="text" name="m_job"></label>
+  </div>
+
+  <h3>ילדי המשפחה</h3>
+  <table>
+    <thead><tr><th class="n">#</th><th>שם</th><th style="width:90px">גיל</th><th>עיסוק</th></tr></thead>
+    <tbody id="kids"></tbody>
+  </table>
+
+  <p class="q">בעיות למידה במשפחה המצומצמת וגם המורחבת</p>
+  <textarea name="family_ld"></textarea>
+</section>
+
+<!-- ============ רקע להפניה ============ -->
+<section>
+  <h2>רקע להפניה</h2>
+  <label class="f">מי הפנה את הילד/ה לטיפול?<input type="text" name="referrer"></label>
+  <p class="q">מהי הבעיה שבגללה הומלץ לפנות לסיוע?</p>
+  <textarea name="ref_problem"></textarea>
+  <p class="q">אבחונים קודמים <small>(מכון להתפתחות הילד, אבחון פסיכולוגי, אבחון נוירולוגי, בדיקת ראייה ושמיעה, ריפוי בעיסוק וכד') – היכן נעשו ומה היו המסקנות</small></p>
+  <textarea name="prev_assess"></textarea>
+</section>
+
+<!-- ============ מידע התפתחותי ============ -->
+<section>
+  <h2>מידע התפתחותי</h2>
+  <div class="grid">
+    <label class="f">נולד/ה בשבוע ההריון<input type="number" name="birth_week" min="20" max="45"></label>
+    <label class="f">משקל לידה (ק"ג)<input type="text" name="birth_weight" inputmode="decimal"></label>
+  </div>
+  <p class="q">סוג הלידה</p>
+  <div class="choice" data-radio="birth_type" data-opts="רגילה|לא רגילה"></div>
+  <label class="f">אם הלידה לא הייתה רגילה – פרטו<input type="text" name="birth_detail"></label>
+
+  <p class="q">בעיות והפרעות במהלך ההריון ו/או הלידה</p>
+  <textarea name="preg_problems"></textarea>
+  <p class="q">תיאור ההתפתחות המוטורית <small>(ישיבה, זחילה, הליכה וכו')</small></p>
+  <textarea name="motor_dev"></textarea>
+  <p class="q">תיאור ההתפתחות הלשונית <small>(מתי החל/ה לומר מילים, מתי משפטים, באיזה קצב רכש/ה מילים חדשות וכו')</small></p>
+  <textarea name="lang_dev"></textarea>
+  <p class="q">תיאור המצב הבריאותי <small>(אשפוזים בבית חולים, חבלות, זעזוע מוח וכו')</small></p>
+  <textarea name="health"></textarea>
+  <p class="q">תיאור ההתפתחות החברתית <small>(חברותיות, פסיביות–אקטיביות, אגרסיביות וכד')</small></p>
+  <textarea name="social_dev"></textarea>
+  <p class="q">היחסים עם בני המשפחה</p>
+  <textarea name="family_rel"></textarea>
+
+  <p class="q">אופי וטיב התגובות הרגשיות <small>(סמנו את מה שמאפיין את הילד/ה)</small></p>
+  <div class="traits" id="traits"></div>
+  <p class="q">אם סימנתם – כלפי מי ובאילו מצבים?</p>
+  <textarea name="traits_context"></textarea>
+
+  <p class="q">תגובות אופייניות נוספות</p>
+  <textarea name="other_reactions"></textarea>
+  <p class="q">מה חשוב לו/ה? במה הוא/היא מתעניין/ת? במה מרבה לעסוק? <small>(ספורט, צפייה בטלוויזיה ובמסכים, מוזיקה, חוגים, קריאה, האזנה לסיפורים וכד')</small></p>
+  <textarea name="interests"></textarea>
+</section>
+
+<!-- ============ תקופת הגן ============ -->
+<section>
+  <h2>תקופת הגן</h2>
+  <p class="q">השתתף/ה במסגרת גן</p>
+  <div class="choice" data-radio="kg_type" data-opts="רגילה|מיוחדת"></div>
+  <p class="q">אם היה/הייתה בגן מיוחד – באיזה גן ומדוע הופנה/תה אליו?</p>
+  <textarea name="kg_special"></textarea>
+  <p class="q">האם התעוררו בעיות כלשהן במסגרת הגן?</p>
+  <div class="choice" data-radio="kg_problems" data-opts="כן|לא"></div>
+  <textarea name="kg_problems_detail" placeholder="אם כן – פרטו"></textarea>
+  <p class="q">האם הילד/ה קיבל/ה עזרה מגננת שילוב / שי"ח?</p>
+  <div class="choice" data-radio="kg_help" data-opts="כן|לא"></div>
+  <p class="q">אם כן – במה התמקדה העזרה והאם חל שיפור?</p>
+  <textarea name="kg_help_detail"></textarea>
+  <p class="q">היד הדומיננטית</p>
+  <div class="choice" data-radio="hand" data-opts="ימין|שמאל"></div>
+  <p class="q">האם יש פעולות שעושה בצד הלא דומיננטי?</p>
+  <textarea name="nondominant"></textarea>
+</section>
+
+<!-- ============ בית הספר ============ -->
+<section>
+  <h2>בית הספר</h2>
+  <p class="q">תולדות הלימודים מאז הכניסה לבית הספר</p>
+  <textarea name="school_history" style="min-height:120px"></textarea>
+  <p class="q">סוג הכיתה שבה לומד/ת כיום</p>
+  <div class="choice" data-radio="class_type" data-opts="רגילה|מיוחדת"></div>
+  <div class="grid"><label class="f">מספר התלמידים בכיתה<input type="number" name="class_size" min="1" max="60"></label></div>
+  <p class="q">יחסו/ה של הילד/ה לבית הספר</p>
+  <textarea name="school_attitude"></textarea>
+  <p class="q">קשרים חברתיים עם בני הכיתה</p>
+  <textarea name="class_social"></textarea>
+  <p class="q">הערות נוספות</p>
+  <textarea name="school_notes" style="min-height:110px"></textarea>
+</section>
+
+<!-- ============ פעילויות ============ -->
+<section>
+  <h2>פעילויות ותחומי עניין</h2>
+
+  <h3>תנועות נוער ו/או מסגרות חברתיות אחרות שהילד/ה משתתף/ת בהן</h3>
+  <div class="legend">לכל מסגרת – בהשוואה לילדים אחרים בני אותו גיל, עד כמה הוא/היא פעיל/ה בה?</div>
+  <table><thead><tr><th class="n">#</th><th>מסגרת</th><th style="width:170px">מידת פעילות</th></tr></thead>
+    <tbody data-acttable="youth" data-cols="act"></tbody></table>
+
+  <h3>פעילויות ספורטיביות שהילד/ה מעדיף/ה <small style="font-weight:400;color:var(--muted)">(שחייה, כדורגל, כדורסל, רכיבת אופניים וכו')</small></h3>
+  <div class="legend">לכל פעילות – בהשוואה לילדים אחרים בני אותו גיל: כמה זמן מבלה בה, ומה הישגיו/ה בה?</div>
+  <table><thead><tr><th class="n">#</th><th>פעילות</th><th style="width:170px">משך הזמן שמבלה בה</th><th style="width:170px">הישגיו/ה בה</th></tr></thead>
+    <tbody data-acttable="sport" data-cols="time,skill"></tbody></table>
+
+  <h3>תחביבים, פעילויות ומשחקים שאינם ספורט <small style="font-weight:400;color:var(--muted)">(איסוף בולים, בובות, נגינה וכו' – לא כולל צפייה בטלוויזיה)</small></h3>
+  <div class="legend">לכל פעילות – בהשוואה לילדים אחרים בני אותו גיל: כמה זמן מבלה בה, ומה הישגיו/ה בה?</div>
+  <table><thead><tr><th class="n">#</th><th>תחביב</th><th style="width:170px">משך הזמן שמבלה בו</th><th style="width:170px">הישגיו/ה בו</th></tr></thead>
+    <tbody data-acttable="hobby" data-cols="time,skill"></tbody></table>
+
+  <h3>עבודות בבית או בחוץ שהילד/ה עושה <small style="font-weight:400;color:var(--muted)">(הדחת כלים, שמרטפות, סידור מיטות וכו')</small></h3>
+  <div class="legend">לכל עבודה – בהשוואה לילדים אחרים בני אותו גיל, עד כמה הוא/היא מיטיב/ה לעשותה?</div>
+  <table><thead><tr><th class="n">#</th><th>עבודה</th><th style="width:170px">עד כמה מיטיב/ה</th></tr></thead>
+    <tbody data-acttable="chores" data-cols="skill"></tbody></table>
+</section>
+
+<!-- ============ קשרים חברתיים ============ -->
+<section>
+  <h2>קשרים חברתיים</h2>
+  <p class="q">בערך כמה חברים קרובים יש לילד/ה?</p>
+  <div class="choice" data-radio="close_friends" data-opts="אף אחד|אחד|שניים–שלושה|ארבעה ומעלה"></div>
+  <p class="q">כמה פעמים בשבוע הילד/ה מבלה איתם מחוץ לשעות בית הספר?</p>
+  <div class="choice" data-radio="friends_freq" data-opts="פחות מפעם אחת|פעם–פעמיים|שלוש פעמים ומעלה"></div>
+
+  <p class="q">בהשוואה לילדים אחרים באותו גיל, כיצד הייתם מעריכים את התנהגות הילד/ה?</p>
+  <table class="rt"><thead><tr><th class="n">#</th><th>תחום</th><th>הערכה</th></tr></thead>
+    <tbody id="behav"></tbody></table>
+</section>
+
+<!-- ============ הישגים לימודיים ============ -->
+<section>
+  <h2>הישגים נוכחיים בלימודים <small style="font-size:14px;font-weight:400;color:var(--muted)">(לילדים מגיל 6 ומעלה)</small></h2>
+  <table class="rt"><thead><tr><th class="n">#</th><th>מקצוע</th><th>הערכה</th></tr></thead>
+    <tbody id="acad"></tbody></table>
+
+  <p class="q">האם הילד/ה נשאר/ה שנתיים באותה כיתה?</p>
+  <div class="choice" data-radio="repeat" data-opts="כן|לא"></div>
+  <p class="q">אם כן – באיזו כיתה ומה היו הסיבות?</p>
+  <textarea name="repeat_detail"></textarea>
+</section>
+
+<!-- ============ רשימת התנהגויות ============ -->
+<section class="cbcl">
+  <h2>רשימת תיאורים</h2>
+  <div class="note" style="margin-top:0">
+    להלן רשימת פריטים המתארים ילדים. סמנו באיזו מידה כל תיאור מתאים לילד/ה <b>בהתייחס לשנה האחרונה</b>:<br>
+    <b>לא נכון</b> · <b>נכון לפעמים</b> (או במידת מה) · <b>נכון מאוד / לרוב</b>.
+    בפריטים שבהם מופיעה שורת „תארו” – כתבו בה תיאור קצר כשהפריט נכון לגבי הילד/ה.
+  </div>
+  <div id="cbcl"></div>
+</section>
+
+<div class="closing">
+  <b>הורים יקרים,</b><br>
+  אני מודה לכם מאוד על המאמץ במילוי השאלון. מידע מקיף זה יסייע באיתור הקשיים ובמיקודם, לצורך קידום הילד/ה והטיפול בו/ה.
+  <div class="sign">יפתח צפריר<span>פסיכולוג חינוכי מומחה</span></div>
+</div>
+</form>
+
+<div class="bar no-print">
+  <button type="button" class="primary" onclick="window.print()">שמירה כ-PDF / הדפסה</button>
+  <button type="button" onclick="saveCopy()">שמירת עותק ממולא</button>
+  <button type="button" onclick="document.getElementById('fileIn').click()">פתיחת עותק שמור</button>
+  <button type="button" onclick="clearAll()">ניקוי הטופס</button>
+  <span class="status" id="status"></span>
+  <input type="file" id="fileIn" accept=".html,.htm,.json">
+</div>
+
+<script id="savedData" type="application/json">{}</script>
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const el = (tag, attrs={}, html='') => { const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; };
+
+  // ---- radio groups ----
+  document.querySelectorAll('[data-radio]').forEach(box=>{
+    const name=box.dataset.radio;
+    box.dataset.opts.split('|').forEach(o=>{
+      const l=el('label'); l.innerHTML=`<input type="radio" name="${name}" value="${o}"> ${o}`; box.appendChild(l);
+    });
+  });
+
+  // value is stored as the original score; parents see only the verbal label
+  const SC={
+    avg:[['0','איני יודע/ת'],['1','פחות מהממוצע'],['2','ממוצע'],['3','יותר מהממוצע']],
+    behav:[['1','גרוע יותר'],['2','באותה מידה'],['3','טוב יותר']],
+    acad:[['1','נכשל'],['2','מתחת לממוצע'],['3','ממוצע'],['4','מעל הממוצע']],
+    cb:[['0','לא נכון'],['1','נכון לפעמים'],['2','נכון מאוד / לרוב']]
+  };
+  const rateCell = (name, scale) =>
+    `<div class="rate">${scale.map(([v,t])=>`<label><input type="radio" name="${name}" value="${v}">${t}</label>`).join('')}</div>`;
+
+  // ---- kids ----
+  const kids=$('#kids');
+  for(let i=1;i<=6;i++){
+    kids.appendChild(el('tr',{},`<td class="n">${i}</td><td><input type="text" name="kid${i}_name"></td>
+      <td><input type="text" name="kid${i}_age" inputmode="numeric"></td><td><input type="text" name="kid${i}_occ"></td>`));
+  }
+
+  // ---- traits ----
+  const traits=['רגיש/ה במיוחד','זקוק/ה לתשומת לב מרובה','צורך בולט באהדה','נעלב/ת בקלות','חרד/ה','עקשן/ית',
+    'בעל/ת מרץ','עצמאי/ת','תלוי/ה בילדים','מנהיג/ה בחברה','ביישן/ית','בעל/ת מעצורים חזקים',
+    'נמצא/ת רוב הזמן בתנועה','אינו/ה מסוגל/ת לשבת במנוחה','שקט/ה במיוחד','ותרן/ית','שאפתן/ית','רברבן/ית',
+    'צנוע/ה','אוהב/ת לעזור','טרדן/ית, „נודניק”'];
+  const tb=$('#traits');
+  traits.forEach((t,i)=>{ const l=el('label'); l.innerHTML=`<input type="checkbox" name="trait_${i}" value="${t}"> ${t}`; tb.appendChild(l); });
+
+  // ---- activity tables ----
+  document.querySelectorAll('[data-acttable]').forEach(tbody=>{
+    const key=tbody.dataset.acttable, cols=tbody.dataset.cols.split(',');
+    const heads=[...tbody.closest('table').querySelectorAll('th')].map(t=>t.textContent);
+    tbody.closest('table').classList.add('act');
+    for(let i=1;i<=3;i++){
+      let row=`<td class="n">${i}</td><td data-label="${heads[1]} ${i}"><input type="text" name="${key}${i}"></td>`;
+      cols.forEach((c,ci)=> row+=`<td data-label="${heads[2+ci]}">${rateCell(`${key}${i}_${c}`,SC.avg)}</td>`);
+      tbody.appendChild(el('tr',{},row));
+    }
+  });
+
+  // ---- behaviour vs peers ----
+  const behav=['מסתדר/ת עם אחיו/אחיותיו','מסתדר/ת עם ילדים אחרים','מתנהג/ת עם הוריו/ה','משחק/ת ועובד/ת לבד'];
+  behav.forEach((b,i)=> $('#behav').appendChild(el('tr',{},`<td class="n">${i+1}</td><td>${b}</td><td>${rateCell('behav'+(i+1),SC.behav)}</td>`)));
+
+  // ---- academics ----
+  const acad=['קריאה','כתיבה','חשבון / מתמטיקה','אנגלית','מקצועות הומניים','מדעים'];
+  acad.forEach((a,i)=> $('#acad').appendChild(el('tr',{},`<td class="n">${i+1}</td><td>${a}</td><td>${rateCell('acad'+(i+1),SC.acad)}</td>`)));
+  $('#acad').appendChild(el('tr',{},`<td class="n">7</td><td><input type="text" name="acad7_name" placeholder="מקצוע נוסף"></td><td>${rateCell('acad7',SC.acad)}</td>`));
+
+  // ---- checklist items: [text, needsDescription] ----
+  const items=[
+    ['מתנהג/ת כילד/ה צעיר/ה מגילו/ה'],['סובל/ת מאלרגיות',1],['מרבה להתווכח'],['סובל/ת מאסתמה'],
+    ['מתנהג/ת כמו בן/בת המין השני'],['עושה את צרכיו/ה מחוץ לבית השימוש'],['מתפאר/ת, מתרברב/ת'],
+    ['אינו/ה יכול/ה להתרכז לזמן ממושך'],['אינו/ה יכול/ה להסיר מחשבות מנושא מסוים (מחשבה כפייתית)',1],
+    ['חסר/ת מנוחה, חסר/ת שקט, מגלה פעילות יתר'],['נצמד/ת למבוגרים, מראה תלות יתר'],['מתלונן/ת על בדידות'],
+    ['מבולבל/ת או נראה/ית כשרוי/ה בערפל'],['מרבה לבכות'],['מתאכזר/ת לבעלי חיים'],
+    ['חולם/ת בהקיץ, מרבה לשקוע במחשבות'],['מתאכזר/ת, מתנהג/ת בשפלות כלפי אחרים'],
+    ['מזיק/ה לעצמו/ה בכוונה, מנסה להתאבד'],['דורש/ת תשומת לב רבה'],['הורס/ת חפצים השייכים לו/ה עצמו/ה'],
+    ['הורס/ת חפצים השייכים לבני משפחתו/ה או לילדים אחרים'],['אינו/ה מציית/ה בבית'],['אינו/ה מציית/ה בבית הספר'],
+    ['אינו/ה אוכל/ת טוב'],['אינו/ה מיטיב/ה להסתדר עם ילדים אחרים'],['חסר/ת רגשי אשם לאחר התנהגות גרועה'],
+    ['מקנא/ת בקלות'],['אוכל/ת ו/או שותה דברים שאינם מזון',1],['מפחד/ת מבעלי חיים, ממצבים או ממקומות מסוימים (לא בית הספר)',1],
+    ['מפחד/ת ללכת לבית הספר'],['מפחד/ת שהוא/היא עלול/ה לחשוב או לעשות דברים רעים'],
+    ['מאמין/ה שהוא/היא חייב/ת להיות מושלם/ת'],['מרגיש/ה או מתלונן/ת שאף אחד לא אוהב אותו/ה'],
+    ['מרגיש/ה שאחרים רוצים להתנכל לו/ה'],['מרגיש/ה חסר/ת ערך או נחות/ה'],['מרבה להיפצע ולהיות מעורב/ת בתאונות'],
+    ['מרבה להתקוטט'],['מרבים להקניט אותו/ה'],['מסתובב/ת עם ילדים המרבים להסתבך'],['שומע/ת דברים שאינם בנמצא',1],
+    ['אימפולסיבי/ת, ממהר/ת לפעול בלי לחשוב'],['אוהב/ת להיות לבד'],['משקר/ת או מרמה'],['כוסס/ת ציפורניים'],
+    ['עצבני/ת, מתוח/ה'],['תנועות עצבניות, עוויתות',1],['סיוטי לילה, חלומות זוועה'],['אינו/ה אהוב/ה על ידי ילדים אחרים'],
+    ['סובל/ת מעצירות'],['מפחד/ת יותר מדי או חרד/ה'],['סובל/ת מסחרחורות'],['מרגיש/ה יותר מדי אשמה'],
+    ['אוכל/ת יותר מדי'],['עייף/ה יותר מדי'],['סובל/ת מעודף משקל'],
+    ['בעיות גופניות ללא הסבר רפואי:','sub'],['תוקף/ת אחרים באופן פיזי'],
+    ['מחטט/ת באף, בעור או בחלקי גוף אחרים',1],['משחק/ת עם איברי המין בפומבי'],['משחק/ת עם איברי המין יתר על המידה'],
+    ['תלמיד/ה חלש/ה'],['חסר/ת קואורדינציה'],['מעדיף/ה לשחק עם ילדים מבוגרים ממנו/ה'],
+    ['מעדיף/ה לשחק עם ילדים צעירים ממנו/ה'],['מסרב/ת לדבר'],['חוזר/ת על פעולות מסוימות שוב ושוב (פעילות כפייתית)',1],
+    ['בורח/ת מהבית'],['מרבה לצרוח'],['מסתודד/ת, שומר/ת דברים לעצמו/ה'],['רואה דברים שאינם בנמצא',1],
+    ['מרגיש/ה שלא בנוח, בא/ה במבוכה בקלות'],['מצית/ה שריפות'],['בעיות מיניות',1],['משוויץ/ה או עושה עצמו/ה ליצן/ית'],
+    ['ביישן/ית, סגור/ה'],['ישן/ה פחות מרוב הילדים'],['ישן/ה יותר מרוב הילדים, במשך היום או הלילה',1],
+    ['מורח/ת או משחק/ת עם הצואה'],['בעיות דיבור',1],['בוהה'],['גונב/ת מהבית'],['גונב/ת מחוץ לבית'],
+    ['אוגר/ת דברים שאינו/ה זקוק/ה להם',1],['התנהגות מוזרה',1],['מחשבות מוזרות',1],['עקשן/ית, מצוברח/ת, רגזן/ית'],
+    ['שינויים פתאומיים במצב הרוח או ברגשות'],['ממורמר/ת'],['חשדן/ית'],['מקלל/ת, מנבל/ת פה'],['מדבר/ת על התאבדות'],
+    ['מדבר/ת או מתהלך/ת בשינה',1],['מדבר/ת יותר מדי'],['מרבה להקניט'],['התקפי זעם, חם/ת מזג'],
+    ['חושב/ת יותר מדי על מין'],['מאיים/ת על אנשים'],['מוצץ/ת אצבע'],['מוטרד/ת מדי מענייני סדר וניקיון'],
+    ['בעיות שינה (קושי להירדם, התעוררויות)',1],['נעדר/ת, מסתלק/ת מבית הספר'],['פחות מדי פעיל/ה, איטי/ת, חסר/ת מרץ'],
+    ['אינו/ה מאושר/ת, מדוכא/ת, עצוב/ה'],['רעשני/ת באופן לא רגיל'],['שותה משקאות חריפים (אלכוהול)',1],
+    ['משתמש/ת בסמים',1],['משחית/ה רכוש'],['אינו/ה שולט/ת על צרכיו/ה ביום'],['מרטיב/ה בלילה'],['מעצבן/ת, מנדנד/ת'],
+    ['רוצה להיות בן/בת המין השני'],['מסוגר/ת ואינו/ה מתקרב/ת לאחרים'],['מרבה לדאוג'],
+    ['בעיות אחרות שאינן מפורטות לעיל',2]
+  ];
+  const subs=['כאבים כלליים','כאבי ראש','בחילות','בעיות עיניים, ראייה (שאינן מתוקנות במשקפיים)','פריחות או בעיות עור אחרות','כאבי בטן','הקאות','בעיות אחרות'];
+  const box=$('#cbcl');
+  const r012 = n => rateCell(n,SC.cb);
+  items.forEach((it,idx)=>{
+    const n=idx+1, [txt,flag]=it;
+    if(flag==='sub'){
+      box.appendChild(el('div',{class:'item'},`<span class="num">${n}.</span><span class="txt">${txt}</span><span></span>`));
+      subs.forEach((s,j)=>{
+        const letter='אבגדהוזח'[j], nm=`cb${n}${letter}`;
+        const row=el('div',{class:'item sub','data-desc':j===7?'1':''},
+          `<span class="num">${letter}.</span><span class="txt">${s}</span>${r012(nm)}`);
+        if(j===7) row.appendChild(el('div',{class:'desc'},`<span>תארו:</span><input type="text" name="${nm}_desc">`));
+        box.appendChild(row);
+      });
+      return;
+    }
+    const nm='cb'+n;
+    const row=el('div',{class:'item','data-desc':flag?'1':''},`<span class="num">${n}.</span><span class="txt">${txt}</span>${r012(nm)}`);
+    if(flag===2) row.appendChild(el('div',{class:'desc'},`<span>פרטו:</span><textarea name="${nm}_desc"></textarea>`));
+    else if(flag) row.appendChild(el('div',{class:'desc'},`<span>תארו:</span><input type="text" name="${nm}_desc">`));
+    box.appendChild(row);
+  });
+
+  // ---- autosize textareas ----
+  const fit = t => { t.style.height='auto'; t.style.height=Math.max(t.scrollHeight+2,76)+'px'; };
+  document.addEventListener('input',e=>{ if(e.target.tagName==='TEXTAREA') fit(e.target); });
+
+  // ---- state ----
+  const form=$('#form'), KEY='parentQuestionnaire_tsafrir_v1', status=$('#status');
+  const collect=()=>{
+    const d={};
+    form.querySelectorAll('input,textarea').forEach(i=>{
+      if(!i.name) return;
+      if(i.type==='radio'){ if(i.checked) d[i.name]=i.value; }
+      else if(i.type==='checkbox'){ if(i.checked) d[i.name]=true; }
+      else if(i.value) d[i.name]=i.value;
+    });
+    return d;
+  };
+  const apply=d=>{
+    form.querySelectorAll('input,textarea').forEach(i=>{
+      if(!i.name) return;
+      if(i.type==='radio') i.checked = d[i.name]===i.value;
+      else if(i.type==='checkbox') i.checked = !!d[i.name];
+      else i.value = d[i.name]||'';
+    });
+    form.querySelectorAll('textarea').forEach(fit);
+  };
+  let timer;
+  const store=()=>{
+    clearTimeout(timer);
+    timer=setTimeout(()=>{
+      try{ localStorage.setItem(KEY,JSON.stringify(collect())); status.textContent='נשמר במחשב ✓'; }
+      catch(e){ status.textContent='לשמירה – „שמירת עותק ממולא”'; }
+    },400);
+  };
+  form.addEventListener('input',store); form.addEventListener('change',store);
+
+  // initial load: embedded data (from a saved copy) wins, else local storage
+  let initial={};
+  try{ initial=JSON.parse($('#savedData').textContent||'{}'); }catch(e){}
+  if(!Object.keys(initial).length){ try{ initial=JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){} }
+  apply(initial);
+  if(!form.fill_date.value) form.fill_date.value=new Date().toISOString().slice(0,10);
+
+  // save a filled copy of this very file
+  window.saveCopy=()=>{
+    const data=JSON.stringify(collect()).replace(/</g,'\\u003c');
+    const clone=document.documentElement.cloneNode(true);
+    // reset generated content so the copy rebuilds cleanly
+    ['#kids','#traits','#behav','#acad','#cbcl','#status'].forEach(s=>{ const n=clone.querySelector(s); if(n) n.innerHTML=''; });
+    clone.querySelectorAll('[data-acttable]').forEach(n=>n.innerHTML='');
+    clone.querySelectorAll('[data-radio]').forEach(n=>n.innerHTML='');
+    clone.querySelectorAll('textarea').forEach(t=>{t.removeAttribute('style'); t.textContent='';});
+    clone.querySelectorAll('input').forEach(i=>i.removeAttribute('value'));
+    clone.querySelector('#savedData').textContent=data;
+    const html='<!DOCTYPE html>\n'+clone.outerHTML;
+    const who=[form.c_first.value,form.c_last.value].filter(Boolean).join('_')||'ממולא';
+    const a=el('a',{download:`שאלון_להורים_${who}.html`,href:URL.createObjectURL(new Blob([html],{type:'text/html'}))});
+    document.body.appendChild(a); a.click(); a.remove();
+    status.textContent='העותק הורד ✓';
+  };
+
+  // open a saved copy
+  $('#fileIn').addEventListener('change',e=>{
+    const f=e.target.files[0]; if(!f) return;
+    f.text().then(t=>{
+      let d=null;
+      try{ d=JSON.parse(t); }catch(_){
+        const m=t.match(/<script id="savedData" type="application\/json">([\s\S]*?)<\/script>/);
+        if(m){ try{ d=JSON.parse(m[1]); }catch(_){} }
+      }
+      if(d){ apply(d); store(); status.textContent='העותק נטען ✓'; } else alert('לא ניתן לקרוא את הקובץ.');
+      e.target.value='';
+    });
+  });
+
+  window.clearAll=()=>{
+    if(!confirm('למחוק את כל התשובות בטופס?')) return;
+    apply({}); try{localStorage.removeItem(KEY);}catch(e){}
+    form.fill_date.value=new Date().toISOString().slice(0,10);
+    status.textContent='הטופס נוקה';
+  };
+  window.addEventListener('beforeprint',()=>form.querySelectorAll('textarea').forEach(fit));
+})();
+</script>
+</body>
+</html>
